@@ -41,6 +41,11 @@
 - name: perform custom actions when not operating on default /etc dir
   when: etckeeper_target_dir != "/etc"
   block:
+    - name: "ensure target dir {{ etckeeper_target_dir }} exists"
+      file:
+        path: "{{ etckeeper_target_dir }}"
+        state: directory
+
     - name: "set up etckeeper to watch {{ etckeeper_target_dir }}"
       command: "etckeeper init -d {{ etckeeper_target_dir }}"
       args:
