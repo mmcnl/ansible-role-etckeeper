@@ -3,7 +3,7 @@
     - hosts: all
       tasks:
         - import_role:
-            name: etckeeper
+            name: mmcnl.etckeeper
           vars:
             etckeeper_task_codename: etc
             etckeeper_target_dir: /etc
