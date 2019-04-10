@@ -1,0 +1,57 @@
+---
+- name: Ensure git is installed
+  apt:
+    pkg: git
+    cache_valid_time: 86400 # 1 day
+
+# etckeeper will fail when invoked by cron if this is not already set. see
+# https://unix.stackexchange.com/a/368851
+- name: Ensure git user.email is set for root
+  git_config:
+    name: user.email
+    scope: global
+    value: "{{ etckeeper_root_user_git_email }}"
+
+- name: Install etckeeper package
+  apt:
+    pkg: etckeeper
+    cache_valid_time: 86400 # 1 day
+
+# NB: just apt-installing the etckeeper apt package will automatically set up
+# etckeeper to watch /etc, so if that's not already happening, that will happen
+# in addition to setting up tracking for the custom target dir specified here
+- name: "check if etckeeper already set up to watch {{ etckeeper_target_dir }}"
+  stat:
+    path: "{{ etckeeper_target_dir }}/.etckeeper"
+  register: etckeeper_installation
+
+- name: "gitignore unnecessary files"
+  blockinfile:
+    path: "{{ etckeeper_target_dir }}/.gitignore"
+    block: "{{ etckeeper_gitignore_additions }}"
+    create: yes
+  when: etckeeper_gitignore_additions != ''
+
+- name: set up daily git garbage collection
+  template:
+    src: etckeeper_git_gc.j2
+    dest: /etc/cron.weekly/etckeeper_{{ etckeeper_task_codename }}_git_gc
+    mode: 0744
+
+- name: perform custom actions when not operating on default /etc dir
+  when: etckeeper_target_dir != "/etc"
+  block:
+    - name: "set up etckeeper to watch {{ etckeeper_target_dir }}"
+      command: "etckeeper init -d {{ etckeeper_target_dir }}"
+      args:
+        creates: "{{ etckeeper_target_dir }}/.git"
+
+    - name: "Add cron job for {{ etckeeper_task_codename }} etckeeper daily autocommit"
+      template:
+        src: etckeeper_autocommit.j2
+        dest: /etc/cron.daily/etckeeper_{{ etckeeper_task_codename }}_autocommit
+        mode: 0744
+
+    - name: "Run daily cron job immediately after installation in {{ etckeeper_target_dir }}"
+      command: "/etc/cron.daily/etckeeper_{{ etckeeper_task_codename }}_autocommit"
+      when: "etckeeper_installation.stat.exists == False"

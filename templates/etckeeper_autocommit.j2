@@ -1,0 +1,16 @@
+#!/bin/sh
+# {{ ansible_managed }}
+
+set -o errexit -o nounset
+echo "$0:"
+
+target_dir={{ etckeeper_target_dir }}
+cd $target_dir
+
+# only proceed if there are changes to the git repo
+if [ -n "$(/usr/bin/git status --porcelain)" ]; then
+    if [ -e /etc/etckeeper/daily ] && [ -e /etc/etckeeper/etckeeper.conf ]; then
+        . /etc/etckeeper/etckeeper.conf
+    fi
+    /usr/bin/etckeeper commit -d $target_dir "{{ etckeeper_task_codename }} daily autocommit"
+fi

@@ -1,0 +1,11 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+set -o errexit -o nounset
+echo "$0:"
+
+target_dir={{ etckeeper_target_dir }}
+cd $target_dir
+
+echo "running git gc for $target_dir..."
+/usr/bin/git gc
