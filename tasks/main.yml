@@ -30,7 +30,7 @@
     path: "{{ etckeeper_target_dir }}/.gitignore"
     block: "{{ etckeeper_gitignore_additions }}"
     create: yes
-  when: etckeeper_gitignore_additions != ''
+  when: etckeeper_gitignore_additions|bool
 
 - name: set up daily git garbage collection
   template:
@@ -59,4 +59,4 @@
 
     - name: "Run daily cron job immediately after installation in {{ etckeeper_target_dir }}"
       command: "/etc/cron.daily/etckeeper_{{ etckeeper_task_codename }}_autocommit"
-      when: "etckeeper_installation.stat.exists == False"
+      when: not etckeeper_installation.stat.exists
