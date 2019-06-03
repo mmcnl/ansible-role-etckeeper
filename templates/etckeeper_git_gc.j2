@@ -7,7 +7,11 @@ echo "$0:"
 target_dir={{ etckeeper_target_dir }}
 cd $target_dir
 
-echo "running git gc for $target_dir..."
+echo "starting usage: $(du -s $target_dir/.git)"
+
 # trick gc into thinking it has a tty, in order to capture output. see
 # https://stackoverflow.com/a/18004259/1163042
-script -q -c '/usr/bin/git gc' | sed 's/\r.*//g'
+echo "running git gc for $target_dir..."
+script -q -c '/usr/bin/git gc' /dev/null | grep Total
+
+echo "end usage: $(du -s $target_dir/.git)"
