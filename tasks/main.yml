@@ -32,7 +32,7 @@
     create: yes
   when: etckeeper_gitignore_additions|bool
 
-- name: set up daily git garbage collection
+- name: set up weekly git garbage collection
   template:
     src: etckeeper_git_gc.j2
     dest: /etc/cron.weekly/etckeeper_{{ etckeeper_task_codename }}_git_gc

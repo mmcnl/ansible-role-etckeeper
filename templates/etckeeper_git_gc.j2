@@ -8,4 +8,6 @@ target_dir={{ etckeeper_target_dir }}
 cd $target_dir
 
 echo "running git gc for $target_dir..."
-/usr/bin/git gc
+# trick gc into thinking it has a tty, in order to capture output. see
+# https://stackoverflow.com/a/18004259/1163042
+script -q -c '/usr/bin/git gc' | sed 's/\r.*//g'
