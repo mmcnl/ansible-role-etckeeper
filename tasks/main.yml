@@ -30,7 +30,7 @@
     path: "{{ etckeeper_target_dir }}/.gitignore"
     block: "{{ etckeeper_gitignore_additions }}"
     create: yes
-  when: etckeeper_gitignore_additions|bool
+  when: etckeeper_gitignore_additions
 
 - name: set up weekly git garbage collection
   template:
