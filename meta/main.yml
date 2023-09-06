@@ -2,12 +2,17 @@
 dependencies: []
 
 galaxy_info:
+  role_name: etckeeper
   author: mmcnl
   description: set up etckeeper
   license: MIT
-  min_ansible_version: 2.8
+  min_ansible_version: "2.8"
   platforms:
     - name: Ubuntu
       versions:
-        - bionic
+        - all
+    - name: Debian
+      versions:
+        - all
+
   galaxy_tags: []
