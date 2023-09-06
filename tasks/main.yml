@@ -4,15 +4,6 @@
     pkg: git
     cache_valid_time: 86400 # 1 day
 
-# etckeeper will fail when invoked by cron if this is not already set. see
-# https://unix.stackexchange.com/a/368851
-- name: Ensure git user.email is set for root
-  community.general.git_config:
-    name: user.email
-    repo: /etc
-    scope: local
-    value: "{{ etckeeper_root_user_git_email }}"
-
 - name: Install etckeeper package
   ansible.builtin.apt:
     pkg: etckeeper
@@ -33,6 +24,15 @@
     mode: 'u=rw,go=r'
     create: true
   when: etckeeper_gitignore_additions
+
+# etckeeper will fail when invoked by cron if this is not already set. see
+# https://unix.stackexchange.com/a/368851
+- name: Ensure git user.email is set for root
+  community.general.git_config:
+    name: user.email
+    repo: /etc
+    scope: local
+    value: "{{ etckeeper_root_user_git_email }}"
 
 - name: Set up weekly git garbage collection
   ansible.builtin.template:
